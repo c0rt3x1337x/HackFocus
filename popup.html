@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackFocus - Mission Control</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-title">HACKFOCUS v1.0.0</div>
+            <div class="terminal-controls">
+                <span class="control-dot red"></span>
+                <span class="control-dot yellow"></span>
+                <span class="control-dot green"></span>
+            </div>
+        </div>
+        
+        <div class="terminal-body">
+            <div class="ascii-art">
+                <pre>
+██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗ ██████╗  ██████╗ ██╗   ██╗███████╗
+██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔═══██╗██╔═══██╗██║   ██║██╔════╝
+███████║███████║██║     █████╔╝ █████╗  ██║   ██║██║   ██║██║   ██║███████╗
+██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██║   ██║██║   ██║██║   ██║╚════██║
+██║  ██║██║  ██║╚██████╗██║  ██╗███████╗╚██████╔╝╚██████╔╝╚██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝
+                </pre>
+            </div>
+            
+            <div class="mission-status">
+                <div class="status-line">
+                    <span class="prompt">root@hackfocus:~$</span>
+                    <span class="command" id="mission-status">Initializing system...</span>
+                </div>
+            </div>
+            
+            <div class="timer-display">
+                <div class="time" id="timer">25:00</div>
+                <div class="session-info">
+                    <span id="session-type">FOCUS SESSION</span>
+                    <span id="session-number">Session 1</span>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-label">Mission Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0% Complete</div>
+            </div>
+            
+            <div class="controls">
+                <button id="start-btn" class="btn btn-primary">
+                    <span class="btn-text">INITIATE HACK</span>
+                    <span class="btn-icon">▶</span>
+                </button>
+                <button id="stop-btn" class="btn btn-danger" disabled>
+                    <span class="btn-text">ABORT MISSION</span>
+                    <span class="btn-icon">⏹</span>
+                </button>
+                <button id="reset-btn" class="btn btn-secondary">
+                    <span class="btn-text">RESET SYSTEM</span>
+                    <span class="btn-icon">↻</span>
+                </button>
+            </div>
+            
+            <div class="settings-section">
+                <div class="setting-group">
+                    <label for="focus-duration">Focus Duration (minutes):</label>
+                    <select id="focus-duration">
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                        <option value="60">60</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="short-break">Short Break (minutes):</label>
+                    <select id="short-break">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="long-break">Long Break (minutes):</label>
+                    <select id="long-break">
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="auto-breaks"> Auto-breaks enabled
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mission-log">
+                <div class="log-header">Mission Log</div>
+                <div class="log-content" id="mission-log">
+                    <div class="log-entry">System initialized. Ready for mission.</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <button id="options-btn" class="btn btn-link">Configure Mission Parameters</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

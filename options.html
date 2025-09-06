@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'; object-src 'self';">
+    <title>HackFocus - Mission Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #001100;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+        }
+        
+        .ascii-art {
+            font-size: 10px;
+            line-height: 1;
+            margin-bottom: 20px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 15px #00ff00;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #ffffff;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00ff00;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .tab.active {
+            border-bottom-color: #00ff00;
+            background: #001100;
+        }
+        
+        .tab:hover {
+            background: #001100;
+        }
+        
+        .tab-content {
+            display: none;
+            background: #001100;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .setting-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+        }
+        
+        .setting-description {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .computer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+            gap: 5px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            min-height: 120px;
+        }
+        
+        .computer-icon {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            background: #001100;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .computer-icon:hover {
+            background: #002200;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .computer-icon.small {
+            color: #00ff00;
+        }
+        
+        .computer-icon.medium {
+            color: #ffff00;
+        }
+        
+        .computer-icon.large {
+            color: #ff6600;
+        }
+        
+        .computer-icon.server {
+            color: #ff0000;
+        }
+        
+        .computer-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #00ff00;
+            padding: 3px 6px;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            font-size: 10px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .computer-icon:hover .computer-tooltip {
+            opacity: 1;
+        }
+        
+        .empty-grid {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            font-size: 12px;
+        }
+        
+        .setting-group label {
+            font-size: 14px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-group input[type="checkbox"] {
+            accent-color: #00ff00;
+            transform: scale(1.2);
+        }
+        
+        .setting-group select {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .site-list {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .site-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #001100;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+        }
+        
+        .site-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .site-url {
+            font-size: 14px;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: 2px solid;
+            border-radius: 4px;
+            background: transparent;
+            color: inherit;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .btn:hover {
+            box-shadow: 0 0 15px currentColor;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+        
+        .btn-danger:hover {
+            background: #ff0000;
+            color: #000;
+        }
+        
+        .btn-primary {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+        
+        .btn-primary:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .add-site {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .add-site input {
+            flex: 1;
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .add-site input::placeholder {
+            color: #666;
+        }
+        
+        .add-site button {
+            padding: 10px 20px;
+        }
+        
+        .mission-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mission-card {
+            background: #000;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mission-card:hover {
+            box-shadow: 0 0 20px #00ff00;
+            transform: translateY(-2px);
+        }
+        
+        .mission-card.selected {
+            background: #001100;
+            box-shadow: 0 0 25px #00ff00;
+        }
+        
+        .mission-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .mission-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 8px;
+        }
+        
+        .mission-description {
+            font-size: 12px;
+            color: #ffffff;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #00ff00;
+        }
+        
+        .status-message {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .status-success {
+            background: #001100;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .status-error {
+            background: #110000;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="ascii-art">
+                <pre>
+    ██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗ ██████╗ ██╗   ██╗███████╗
+    ██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔═══██╗██║   ██║██╔════╝
+    ███████║███████║██║     █████╔╝ █████╗  ██║   ██║██║   ██║███████╗
+    ██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██║   ██║██║   ██║╚════██║
+    ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗╚██████╔╝╚██████╔╝███████║
+    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝
+                </pre>
+            </div>
+            <div class="title">Mission Configuration</div>
+            <div class="subtitle">Configure your HackFocus security protocols and mission parameters</div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="blocking">Site Blocking</button>
+            <button class="tab" data-tab="pomodoro">Pomodoro Settings</button>
+            <button class="tab" data-tab="missions">Mission Themes</button>
+            <button class="tab" data-tab="stats">Mission Statistics</button>
+        </div>
+        
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        
+        <!-- Site Blocking Tab -->
+        <div id="blocking" class="tab-content active">
+            <div class="section">
+                <div class="section-title">Blocking Configuration</div>
+                
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="blocking-enabled">
+                        Enable site blocking during focus sessions
+                    </label>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="block-mode">Blocking Mode:</label>
+                    <select id="block-mode">
+                        <option value="blocklist">Block List (block only listed sites)</option>
+                        <option value="allowlist">Allow List (block all except listed sites)</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <button class="btn btn-secondary" id="reloadBlockSettings">Reload Block Settings</button>
+                    <div class="setting-description">Force reload block settings in background script</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Blocked Sites</div>
+                <div class="add-site">
+                    <input type="text" id="new-site" placeholder="Enter domain (e.g., facebook.com)">
+                    <button class="btn btn-primary" id="addBlockedSite">Add Site</button>
+                </div>
+                <div class="site-list" id="blocked-sites-list">
+                    <!-- Sites will be populated here -->
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Allowed Sites</div>
+                <div class="add-site">
+                    <input type="text" id="new-allowed-site" placeholder="Enter domain (e.g., github.com)">
+                    <button class="btn btn-primary" id="addAllowedSite">Add Site</button>
+                </div>
+                <div class="site-list" id="allowed-sites-list">
+                    <!-- Sites will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pomodoro Settings Tab -->
+        <div id="pomodoro" class="tab-content">
+            <div class="section">
+                <div class="section-title">Timer Settings</div>
+                
+                <div class="setting-group">
+                    <label for="focus-duration">Focus Duration (minutes):</label>
+                    <select id="focus-duration">
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                        <option value="60">60</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="short-break">Short Break (minutes):</label>
+                    <select id="short-break">
+                        <option value="3">3</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="long-break">Long Break (minutes):</label>
+                    <select id="long-break">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="auto-breaks">
+                        Enable automatic breaks
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mission Themes Tab -->
+        <div id="missions" class="tab-content">
+            <div class="section">
+                <div class="section-title">Choose Your Mission</div>
+                <div class="mission-selector">
+                    <div class="mission-card" data-mission="mainframe" id="mission-mainframe">
+                        <div class="mission-icon">🖥️</div>
+                        <div class="mission-name">Mainframe Hack</div>
+                        <div class="mission-description">Classic corporate system infiltration</div>
+                    </div>
+                    <div class="mission-card" data-mission="vault" id="mission-vault">
+                        <div class="mission-icon">🏦</div>
+                        <div class="mission-name">Vault Breach</div>
+                        <div class="mission-description">High-security facility penetration</div>
+                    </div>
+                    <div class="mission-card" data-mission="satellite" id="mission-satellite">
+                        <div class="mission-icon">🛰️</div>
+                        <div class="mission-name">Satellite Uplink</div>
+                        <div class="mission-description">Space-based communication hack</div>
+                    </div>
+                    <div class="mission-card" data-mission="matrix" id="mission-matrix">
+                        <div class="mission-icon">🔮</div>
+                        <div class="mission-name">Matrix Protocol</div>
+                        <div class="mission-description">Reality-bending digital infiltration</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Tab -->
+        <div id="stats" class="tab-content">
+            <div class="section">
+                <div class="section-title">Mission Statistics</div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-sessions">0</div>
+                        <div class="stat-label">Total Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-time">0h</div>
+                        <div class="stat-label">Focus Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="sites-blocked">0</div>
+                        <div class="stat-label">Sites Blocked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-streak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button class="btn btn-primary" id="saveSettings">Save Configuration</button>
+            <button class="btn btn-danger" id="resetSettings">Reset to Defaults</button>
+        </div>
+    </div>
+    
+    <script src="options.js"></script>
+</body>
+</html>

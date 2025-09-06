@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACCESS DENIED - HackFocus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #ff0000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 2px,
+                rgba(0, 255, 0, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .ascii-art {
+            font-size: 12px;
+            line-height: 1;
+            margin-bottom: 30px;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+            animation: glitch 2s infinite;
+        }
+        
+        .access-denied {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .warning-text {
+            font-size: 18px;
+            color: #ffff00;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #ffff00;
+        }
+        
+        .system-message {
+            font-size: 14px;
+            color: #00ff00;
+            margin-bottom: 20px;
+            background: #001100;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .motivational {
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .terminal-prompt {
+            font-size: 14px;
+            color: #00ff00;
+            margin-bottom: 20px;
+        }
+        
+        .countdown {
+            font-size: 24px;
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #ff0000;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: 2px solid;
+            border-radius: 4px;
+            background: transparent;
+            color: inherit;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            box-shadow: 0 0 20px currentColor;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+        
+        .btn-primary:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .btn-danger {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+        
+        .btn-danger:hover {
+            background: #ff0000;
+            color: #000;
+        }
+        
+        .matrix-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            color: #00ff00;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            animation: matrix-fall linear infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 20px #ff0000; }
+            50% { text-shadow: 0 0 30px #ff0000, 0 0 40px #ff0000; }
+            100% { text-shadow: 0 0 20px #ff0000; }
+        }
+        
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        
+        .error-codes {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="matrix-rain" id="matrix-rain"></div>
+    
+    <div class="container">
+        <div class="ascii-art">
+            <pre>
+    ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗
+    ██╔════╝██║   ██║██╔════╝╚══██╔══╝██╔════╝████╗ ████║
+    ███████╗██║   ██║███████╗   ██║   █████╗  ██╔████╔██║
+    ╚════██║██║   ██║╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║
+    ███████║╚██████╔╝███████║   ██║   ███████╗██║ ╚═╝ ██║
+    ╚══════╝ ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝
+            </pre>
+        </div>
+        
+        <div class="access-denied">ACCESS DENIED</div>
+        
+        <div class="warning-text">⚠️ UNAUTHORIZED ACCESS ATTEMPT DETECTED ⚠️</div>
+        
+        <div class="system-message">
+            <div class="terminal-prompt">root@hackfocus:~$ system_status</div>
+            <div>ERROR: Site blocked by HackFocus security protocol</div>
+            <div>REASON: Distraction detected during focus session</div>
+            <div>STATUS: Mission in progress - maintain focus</div>
+            <div>TIMESTAMP: <span id="timestamp"></span></div>
+        </div>
+        
+        <div class="motivational" id="motivational-message">
+            "The best hackers stay focused. Your mission awaits."
+        </div>
+        
+        <div class="countdown" id="countdown">
+            Returning to mission in: <span id="countdown-timer">10</span>s
+        </div>
+        
+        <div class="buttons">
+            <button class="btn btn-primary" id="return-btn">
+                Return to Mission
+            </button>
+            <button class="btn btn-danger" id="override-btn">
+                Override (Not Recommended)
+            </button>
+        </div>
+        
+        <div class="error-codes">
+            ERROR_CODE: HF_BLOCK_001 | SECURITY_LEVEL: MAXIMUM | PROTOCOL: POMODORO_FOCUS
+        </div>
+    </div>
+    
+    <script>
+        const motivationalMessages = [
+            "The best hackers stay focused. Your mission awaits.",
+            "Distraction is the enemy of progress. Stay on target.",
+            "Every great hack requires unwavering focus.",
+            "The mainframe won't crack itself. Get back to work.",
+            "Your future self will thank you for this discipline.",
+            "Focus is your superpower. Don't waste it.",
+            "The matrix is waiting. Complete your mission.",
+            "Great hackers don't get distracted. Neither do you."
+        ];
+        
+        let countdown = 10;
+        let countdownInterval;
+        
+        function init() {
+            console.log('Blocked page initialized');
+            console.log('Document ready state:', document.readyState);
+            console.log('All buttons in document:', document.querySelectorAll('button'));
+            
+            // Set timestamp
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Set random motivational message
+            const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+            document.getElementById('motivational-message').textContent = `"${randomMessage}"`;
+            
+            // Start countdown
+            startCountdown();
+            
+            // Create matrix rain effect
+            createMatrixRain();
+            
+            // Add button functionality
+            document.getElementById('return-btn').onclick = function() {
+                window.history.back();
+            };
+            
+            document.getElementById('override-btn').onclick = function() {
+                if (confirm('Override blocking?')) {
+                    chrome.runtime.sendMessage({action: 'disableBlocking'}, function() {
+                        window.location.reload();
+                    });
+                }
+            };
+            
+            console.log('Blocked page initialized with button handlers');
+        }
+        
+        function startCountdown() {
+            countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown-timer').textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    window.history.back();
+                }
+            }, 1000);
+        }
+        
+        // Simple inline onclick handlers are used instead of separate functions
+        
+        function createMatrixRain() {
+            const matrixRain = document.getElementById('matrix-rain');
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            for (let i = 0; i < 50; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = Math.random() * 100 + '%';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 2 + 's';
+                
+                let text = '';
+                for (let j = 0; j < 20; j++) {
+                    text += characters[Math.floor(Math.random() * characters.length)] + '<br>';
+                }
+                column.innerHTML = text;
+                
+                matrixRain.appendChild(column);
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
