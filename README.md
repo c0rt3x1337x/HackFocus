@@ -5,24 +5,36 @@ A hacker-themed Pomodoro timer extension for Firefox that helps you stay focused
 ## Features
 
 ### 🎯 Pomodoro Timer
+
+<img width="554" height="748" alt="image" src="https://github.com/user-attachments/assets/717bbf92-83f0-4576-a738-a7f370514079" />
+
 - Customizable focus sessions (15-60 minutes)
 - Automatic short and long breaks
 - Hacker-themed mission progress tracking
 - Session statistics and streaks
 
 ### 🚫 Site Blocking
+
+<img width="1511" height="1277" alt="image" src="https://github.com/user-attachments/assets/24a5e291-5adb-4476-81a6-c5e75ca52d08" />
+
 - Block distracting websites during focus sessions
 - Choose between blocklist or allowlist mode
 - Customizable site lists
 - Hacker-style "ACCESS DENIED" block page
 
 ### 🎮 Gamification
+
+<img width="1627" height="1177" alt="image" src="https://github.com/user-attachments/assets/7c9875cc-fcaa-4c58-a296-fa72ad4980da" />
+
 - Mission-based progress tracking
 - Different themes: Mainframe, Vault, Satellite, Matrix
 - Hacker-style notifications and messages
 - ASCII art and terminal aesthetics
 
 ### 🎨 Hacker Theme
+
+<img width="1576" height="934" alt="image" src="https://github.com/user-attachments/assets/017e221b-65a9-49a6-8177-57f40a80aca9" />
+
 - Dark terminal-style UI
 - Green-on-black color scheme
 - Glitch animations and effects
