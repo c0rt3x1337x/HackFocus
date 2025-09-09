@@ -349,11 +349,15 @@ class HackFocusBackground {
                 stats.dailyStats[today] = {
                     totalTime: 0,
                     sessions: 0,
-                    date: today
+                    date: today,
+                    tasksCompleted: 0
                 };
             }
             stats.dailyStats[today].totalTime += sessionDuration;
             stats.dailyStats[today].sessions++;
+            
+            // Update task completion stats
+            this.updateTaskStats();
             
             // Calculate current streak
             stats.currentStreak = this.calculateStreak(stats.dailyStats);
@@ -397,6 +401,23 @@ class HackFocusBackground {
         }
         
         return streak;
+    }
+    
+    updateTaskStats() {
+        chrome.storage.local.get(['hackFocusTasks'], (result) => {
+            const tasks = result.hackFocusTasks || [];
+            const completedTasks = tasks.filter(task => task.completed).length;
+            
+            // Update today's task completion count
+            const today = new Date().toISOString().split('T')[0];
+            chrome.storage.local.get(['hackFocusStats'], (statsResult) => {
+                const stats = statsResult?.hackFocusStats || {};
+                if (stats.dailyStats && stats.dailyStats[today]) {
+                    stats.dailyStats[today].tasksCompleted = completedTasks;
+                    chrome.storage.local.set({ hackFocusStats: stats });
+                }
+            });
+        });
     }
     
     showTimerNotification(timerState) {

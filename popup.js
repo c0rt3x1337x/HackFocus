@@ -12,6 +12,8 @@ class HackFocusPopup {
             autoBreaks: true
         };
         
+        this.tasks = [];
+        
         this.missionMessages = {
             focus: [
                 "Establishing backdoor...",
@@ -46,6 +48,8 @@ class HackFocusPopup {
         console.log('Popup: loadSettings() completed');
         this.loadState();
         console.log('Popup: loadState() called');
+        this.loadTasks();
+        console.log('Popup: loadTasks() called');
         this.setupEventListeners();
         this.updateUI();
         this.updateMissionLog("System initialized. Ready for mission.");
@@ -124,11 +128,134 @@ class HackFocusPopup {
         }
     }
     
+    // To-Do List Methods
+    loadTasks() {
+        chrome.storage.local.get(['hackFocusTasks'], (result) => {
+            this.tasks = result.hackFocusTasks || [];
+            this.updateTasksDisplay();
+        });
+    }
+    
+    saveTasks() {
+        chrome.storage.local.set({ hackFocusTasks: this.tasks });
+    }
+    
+    addTask(text) {
+        if (text.trim()) {
+            const task = {
+                id: Date.now(),
+                text: text.trim(),
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            this.tasks.push(task);
+            this.saveTasks();
+            this.updateTasksDisplay();
+            this.updateMissionLog(`Mission objective added: ${text.trim()}`);
+        }
+    }
+    
+    toggleTask(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            this.saveTasks();
+            this.updateTasksDisplay();
+            const status = task.completed ? 'completed' : 'pending';
+            this.updateMissionLog(`Objective ${status}: ${task.text}`);
+        }
+    }
+    
+    removeTask(id) {
+        const taskIndex = this.tasks.findIndex(t => t.id === id);
+        if (taskIndex !== -1) {
+            const task = this.tasks[taskIndex];
+            this.tasks.splice(taskIndex, 1);
+            this.saveTasks();
+            this.updateTasksDisplay();
+            this.updateMissionLog(`Objective removed: ${task.text}`);
+        }
+    }
+    
+    updateTasksDisplay() {
+        const tasksList = document.getElementById('tasks-list');
+        const objectivesCount = document.getElementById('objectives-count');
+        const completedTasks = document.getElementById('completed-tasks');
+        const remainingTasks = document.getElementById('remaining-tasks');
+        
+        if (!tasksList) return;
+        
+        // Clear existing tasks
+        tasksList.innerHTML = '';
+        
+        // Update counts
+        const completed = this.tasks.filter(t => t.completed).length;
+        const remaining = this.tasks.length - completed;
+        
+        objectivesCount.textContent = `${this.tasks.length} task${this.tasks.length !== 1 ? 's' : ''}`;
+        completedTasks.textContent = completed;
+        remainingTasks.textContent = remaining;
+        
+        // Add tasks to display
+        this.tasks.forEach(task => {
+            const taskElement = this.createTaskElement(task);
+            tasksList.appendChild(taskElement);
+        });
+        
+        // Show empty state if no tasks
+        if (this.tasks.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.style.cssText = 'text-align: center; color: #666; padding: 20px; font-size: 11px; font-style: italic;';
+            emptyState.textContent = 'No mission objectives. Add some tasks to focus on!';
+            tasksList.appendChild(emptyState);
+        }
+    }
+    
+    createTaskElement(task) {
+        const taskDiv = document.createElement('div');
+        taskDiv.className = `task-item ${task.completed ? 'completed' : ''}`;
+        
+        const checkbox = document.createElement('div');
+        checkbox.className = `task-checkbox ${task.completed ? 'checked' : ''}`;
+        checkbox.addEventListener('click', () => this.toggleTask(task.id));
+        
+        const textSpan = document.createElement('span');
+        textSpan.className = 'task-text';
+        textSpan.textContent = task.text;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'task-remove';
+        removeBtn.innerHTML = '×';
+        removeBtn.addEventListener('click', () => this.removeTask(task.id));
+        
+        taskDiv.appendChild(checkbox);
+        taskDiv.appendChild(textSpan);
+        taskDiv.appendChild(removeBtn);
+        
+        return taskDiv;
+    }
+    
     setupEventListeners() {
         document.getElementById('start-btn').addEventListener('click', () => this.startTimer());
         document.getElementById('stop-btn').addEventListener('click', () => this.stopTimer());
         document.getElementById('reset-btn').addEventListener('click', () => this.resetTimer());
         document.getElementById('options-btn').addEventListener('click', () => this.openOptions());
+        
+        // To-do list event listeners
+        document.getElementById('add-task-btn').addEventListener('click', () => {
+            const input = document.getElementById('new-task-input');
+            this.addTask(input.value);
+            input.value = '';
+        });
+        
+        document.getElementById('new-task-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('new-task-input');
+                this.addTask(input.value);
+                input.value = '';
+            }
+        });
         
         // Settings change listeners
         document.getElementById('focus-duration').addEventListener('change', (e) => {

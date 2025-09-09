@@ -556,7 +556,8 @@ class HackFocusOptions {
             const dayData = dailyStats[dateStr] || {
                 totalTime: 0,
                 sessions: 0,
-                date: dateStr
+                date: dateStr,
+                tasksCompleted: 0
             };
             
             data.push({
@@ -564,6 +565,7 @@ class HackFocusOptions {
                 displayDate: this.formatDisplayDate(date),
                 totalTime: dayData.totalTime,
                 sessions: dayData.sessions,
+                tasksCompleted: dayData.tasksCompleted || 0,
                 avgSession: dayData.sessions > 0 ? Math.round(dayData.totalTime / dayData.sessions) : 0
             });
         }
@@ -653,7 +655,7 @@ class HackFocusOptions {
         
         if (chartData.length === 0) {
             console.log('Options: No table data to display');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666; padding: 20px;">No focus data available</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666; padding: 20px;">No focus data available</td></tr>';
             return;
         }
         
@@ -670,6 +672,7 @@ class HackFocusOptions {
                 <td>${day.displayDate}</td>
                 <td>${this.formatTime(day.totalTime)}</td>
                 <td>${day.sessions}</td>
+                <td>${day.tasksCompleted}</td>
                 <td>${day.avgSession > 0 ? this.formatTime(day.avgSession) : '-'}</td>
                 <td><span class="status-indicator ${statusClass}"></span>${statusText}</td>
             `;

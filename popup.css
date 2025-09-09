@@ -223,6 +223,187 @@ body {
     padding: 4px;
 }
 
+.btn-small {
+    padding: 4px 8px;
+    font-size: 10px;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-small .btn-icon {
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Mission Objectives (To-Do List) */
+.mission-objectives {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #001100;
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+}
+
+.objectives-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.objectives-title {
+    font-size: 12px;
+    color: #00ff00;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.objectives-count {
+    font-size: 10px;
+    color: #888;
+}
+
+.add-task-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+#new-task-input {
+    flex: 1;
+    background: #000;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    border-radius: 3px;
+    padding: 6px 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+}
+
+#new-task-input::placeholder {
+    color: #666;
+}
+
+#new-task-input:focus {
+    outline: none;
+    border-color: #00ff88;
+    box-shadow: 0 0 5px #00ff00;
+}
+
+.tasks-list {
+    max-height: 120px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    border-color: #00ff00;
+    background: #001100;
+}
+
+.task-item.completed {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+.task-item.completed .task-text {
+    color: #888;
+}
+
+.task-checkbox {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #00ff00;
+    border-radius: 2px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.task-checkbox:hover {
+    background: #001100;
+}
+
+.task-checkbox.checked {
+    background: #00ff00;
+    color: #000;
+}
+
+.task-checkbox.checked::after {
+    content: '✓';
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.task-text {
+    flex: 1;
+    font-size: 11px;
+    color: #ffffff;
+    word-wrap: break-word;
+}
+
+.task-remove {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ff0000;
+    border-radius: 2px;
+    background: transparent;
+    color: #ff0000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s ease;
+}
+
+.task-remove:hover {
+    background: #ff0000;
+    color: #000;
+}
+
+.objectives-stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid #333;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: #888;
+}
+
+.stat-value {
+    font-size: 10px;
+    color: #00ff00;
+    font-weight: bold;
+}
+
 .settings-section {
     margin-bottom: 20px;
     padding: 12px;

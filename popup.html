@@ -67,6 +67,36 @@
                 </button>
             </div>
             
+            <!-- Mission Objectives (To-Do List) -->
+            <div class="mission-objectives">
+                <div class="objectives-header">
+                    <span class="objectives-title">Mission Objectives</span>
+                    <span class="objectives-count" id="objectives-count">0 tasks</span>
+                </div>
+                
+                <div class="add-task-container">
+                    <input type="text" id="new-task-input" placeholder="Enter mission objective..." maxlength="100">
+                    <button id="add-task-btn" class="btn btn-small">
+                        <span class="btn-icon">+</span>
+                    </button>
+                </div>
+                
+                <div class="tasks-list" id="tasks-list">
+                    <!-- Tasks will be populated here -->
+                </div>
+                
+                <div class="objectives-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Completed:</span>
+                        <span class="stat-value" id="completed-tasks">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Remaining:</span>
+                        <span class="stat-value" id="remaining-tasks">0</span>
+                    </div>
+                </div>
+            </div>
+            
             <div class="settings-section">
                 <div class="setting-group">
                     <label for="focus-duration">Focus Duration (minutes):</label>
