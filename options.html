@@ -646,6 +646,216 @@
         .status-none {
             background: #666;
         }
+        
+        /* GitHub-style Contribution Grid */
+        .contribution-grid-container {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .contribution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .contribution-header h3 {
+            color: #00ff00;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .year-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .year-selector label {
+            color: #ffffff;
+            font-size: 14px;
+        }
+        
+        .year-selector select {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .contribution-grid-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .contribution-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 2px;
+            padding: 10px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .contribution-square {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .contribution-square:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+        
+        /* Contribution intensity levels */
+        .contribution-square.level-0 {
+            background: #161b22;
+            border: 1px solid #30363d;
+        }
+        
+        .contribution-square.level-1 {
+            background: #0e4429;
+            border: 1px solid #00ff00;
+        }
+        
+        .contribution-square.level-2 {
+            background: #006d32;
+            border: 1px solid #00ff00;
+        }
+        
+        .contribution-square.level-3 {
+            background: #26a641;
+            border: 1px solid #00ff00;
+        }
+        
+        .contribution-square.level-4 {
+            background: #39d353;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 5px #00ff00;
+        }
+        
+        .contribution-square:hover {
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .contribution-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #00ff00;
+            padding: 8px 12px;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            margin-bottom: 5px;
+        }
+        
+        .contribution-square:hover .contribution-tooltip {
+            opacity: 1;
+        }
+        
+        .contribution-legend {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
+            justify-content: flex-end;
+        }
+        
+        .legend-squares {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .legend-square {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        .legend-square.level-0 {
+            background: #161b22;
+            border: 1px solid #30363d;
+        }
+        
+        .legend-square.level-1 {
+            background: #0e4429;
+            border: 1px solid #00ff00;
+        }
+        
+        .legend-square.level-2 {
+            background: #006d32;
+            border: 1px solid #00ff00;
+        }
+        
+        .legend-square.level-3 {
+            background: #26a641;
+            border: 1px solid #00ff00;
+        }
+        
+        .legend-square.level-4 {
+            background: #39d353;
+            border: 1px solid #00ff00;
+        }
+        
+        /* Month labels */
+        .month-labels {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 2px;
+            margin-bottom: 5px;
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+        }
+        
+        .month-label {
+            padding: 2px;
+        }
+        
+        /* Day labels */
+        .day-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-right: 10px;
+            font-size: 10px;
+            color: #888;
+            text-align: right;
+            padding-top: 12px;
+        }
+        
+        .day-label {
+            height: 12px;
+            line-height: 12px;
+        }
+        
+        .contribution-grid-with-labels {
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -847,6 +1057,37 @@
                         <div class="dashboard-stat">
                             <span class="dashboard-stat-label">Active Days:</span>
                             <span class="dashboard-stat-value" id="active-days">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- GitHub-style Contribution Grid -->
+                <div class="contribution-grid-container">
+                    <div class="contribution-header">
+                        <h3>Focus Activity</h3>
+                        <div class="year-selector">
+                            <label for="contributionYear">Year:</label>
+                            <select id="contributionYear">
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="contribution-grid-wrapper">
+                        <div class="contribution-grid" id="contribution-grid">
+                            <!-- Contribution squares will be generated here -->
+                        </div>
+                        <div class="contribution-legend">
+                            <span>Less</span>
+                            <div class="legend-squares">
+                                <div class="legend-square level-0"></div>
+                                <div class="legend-square level-1"></div>
+                                <div class="legend-square level-2"></div>
+                                <div class="legend-square level-3"></div>
+                                <div class="legend-square level-4"></div>
+                            </div>
+                            <span>More</span>
                         </div>
                     </div>
                 </div>

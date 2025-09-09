@@ -353,6 +353,9 @@ class HackFocusOptions {
             
             // Update daily dashboard
             this.updateDailyDashboard(stats.dailyStats);
+            
+            // Update contribution grid
+            this.updateContributionGrid(stats.dailyStats);
         });
     }
     
@@ -691,6 +694,111 @@ class HackFocusOptions {
         }
     }
     
+    updateContributionGrid(dailyStats) {
+        console.log('Options: updateContributionGrid called with:', dailyStats);
+        
+        const gridContainer = document.getElementById('contribution-grid');
+        if (!gridContainer) {
+            console.error('Options: Contribution grid container not found!');
+            return;
+        }
+        
+        const selectedYear = parseInt(document.getElementById('contributionYear').value) || new Date().getFullYear();
+        console.log('Options: Selected year:', selectedYear);
+        
+        // Generate contribution data for the selected year
+        const contributionData = this.generateContributionData(dailyStats || {}, selectedYear);
+        console.log('Options: Generated contribution data:', contributionData);
+        
+        // Clear existing grid
+        gridContainer.innerHTML = '';
+        
+        // Generate grid squares
+        contributionData.forEach((day, index) => {
+            const square = document.createElement('div');
+            square.className = `contribution-square level-${day.level}`;
+            square.setAttribute('data-date', day.date);
+            square.setAttribute('data-time', day.totalTime);
+            square.setAttribute('data-sessions', day.sessions);
+            
+            // Add tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'contribution-tooltip';
+            tooltip.innerHTML = `
+                <div><strong>${day.displayDate}</strong></div>
+                <div>Focus: ${day.totalTime}m</div>
+                <div>Sessions: ${day.sessions}</div>
+            `;
+            square.appendChild(tooltip);
+            
+            gridContainer.appendChild(square);
+        });
+        
+        console.log('Options: Contribution grid updated with', gridContainer.children.length, 'squares');
+    }
+    
+    generateContributionData(dailyStats, year) {
+        const data = [];
+        const startDate = new Date(year, 0, 1); // January 1st
+        const endDate = new Date(year, 11, 31); // December 31st
+        
+        // Calculate the start of the contribution grid (Sunday of the first week)
+        const firstSunday = new Date(startDate);
+        firstSunday.setDate(startDate.getDate() - startDate.getDay());
+        
+        // Generate 53 weeks of data (53 * 7 = 371 days)
+        for (let week = 0; week < 53; week++) {
+            for (let day = 0; day < 7; day++) {
+                const currentDate = new Date(firstSunday);
+                currentDate.setDate(firstSunday.getDate() + (week * 7) + day);
+                
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const dayData = dailyStats[dateStr] || {
+                    totalTime: 0,
+                    sessions: 0,
+                    date: dateStr
+                };
+                
+                data.push({
+                    date: dateStr,
+                    displayDate: this.formatContributionDate(currentDate),
+                    totalTime: dayData.totalTime,
+                    sessions: dayData.sessions,
+                    level: this.getContributionLevel(dayData.totalTime),
+                    isCurrentYear: currentDate.getFullYear() === year
+                });
+            }
+        }
+        
+        return data;
+    }
+    
+    getContributionLevel(totalTime) {
+        if (totalTime === 0) return 0;
+        if (totalTime < 15) return 1;
+        if (totalTime < 30) return 2;
+        if (totalTime < 60) return 3;
+        return 4;
+    }
+    
+    formatContributionDate(date) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        } else {
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+            });
+        }
+    }
+    
     showStatus(message, type) {
         const statusElement = document.getElementById('status-message');
         statusElement.textContent = message;
@@ -823,6 +931,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listener for time range selector
     document.getElementById('timeRange').addEventListener('change', () => {
         // Reload stats to update dashboard with new time range
+        options.loadStats();
+    });
+    
+    // Add event listener for contribution year selector
+    document.getElementById('contributionYear').addEventListener('change', () => {
+        // Reload stats to update contribution grid with new year
         options.loadStats();
     });
 });
