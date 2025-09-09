@@ -321,7 +321,11 @@ class HackFocusOptions {
     }
     
     loadStats() {
+        console.log('Options: loadStats() called');
+        
         chrome.storage.local.get(['hackFocusStats'], (result) => {
+            console.log('Options: Storage result:', result);
+            
             const stats = result?.hackFocusStats || {
                 totalSessions: 0,
                 totalTime: 0,
@@ -335,6 +339,9 @@ class HackFocusOptions {
                 },
                 dailyStats: {}   // Daily focus tracking
             };
+            
+            console.log('Options: Final stats object:', stats);
+            console.log('Options: Daily stats:', stats.dailyStats);
             
             document.getElementById('total-sessions').textContent = stats.totalSessions;
             document.getElementById('total-time').textContent = this.formatTime(stats.totalTime);
@@ -501,8 +508,28 @@ class HackFocusOptions {
     }
     
     updateDailyDashboard(dailyStats) {
-        const timeRange = parseInt(document.getElementById('timeRange').value) || 7;
-        const chartData = this.getDailyChartData(dailyStats, timeRange);
+        console.log('Options: updateDailyDashboard called with:', dailyStats);
+        
+        // Check if dashboard elements exist
+        const timeRangeElement = document.getElementById('timeRange');
+        const chartElement = document.getElementById('daily-chart');
+        const tableBody = document.getElementById('daily-details-body');
+        
+        console.log('Options: Dashboard elements found:', {
+            timeRange: !!timeRangeElement,
+            chart: !!chartElement,
+            tableBody: !!tableBody
+        });
+        
+        if (!timeRangeElement || !chartElement || !tableBody) {
+            console.error('Options: Dashboard elements not found!');
+            return;
+        }
+        
+        const timeRange = parseInt(timeRangeElement.value) || 7;
+        const chartData = this.getDailyChartData(dailyStats || {}, timeRange);
+        
+        console.log('Options: Chart data generated:', chartData);
         
         // Update dashboard stats
         this.updateDashboardStats(chartData);
@@ -567,13 +594,28 @@ class HackFocusOptions {
     }
     
     updateDailyChart(chartData) {
+        console.log('Options: updateDailyChart called with:', chartData);
+        
         const chartContainer = document.getElementById('daily-chart');
+        if (!chartContainer) {
+            console.error('Options: Chart container not found!');
+            return;
+        }
+        
         chartContainer.innerHTML = '';
         
-        const maxTime = Math.max(...chartData.map(day => day.totalTime), 1);
+        if (chartData.length === 0) {
+            console.log('Options: No chart data to display');
+            chartContainer.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No focus data available</div>';
+            return;
+        }
         
-        chartData.forEach(day => {
+        const maxTime = Math.max(...chartData.map(day => day.totalTime), 1);
+        console.log('Options: Max time for chart:', maxTime);
+        
+        chartData.forEach((day, index) => {
             const barHeight = (day.totalTime / maxTime) * 100;
+            console.log(`Options: Day ${index}: ${day.displayDate}, time: ${day.totalTime}m, height: ${barHeight}%`);
             
             const bar = document.createElement('div');
             bar.className = 'chart-bar';
@@ -591,13 +633,30 @@ class HackFocusOptions {
             bar.appendChild(value);
             chartContainer.appendChild(bar);
         });
+        
+        console.log('Options: Chart updated with', chartContainer.children.length, 'bars');
     }
     
     updateDailyDetailsTable(chartData) {
+        console.log('Options: updateDailyDetailsTable called with:', chartData);
+        
         const tbody = document.getElementById('daily-details-body');
+        if (!tbody) {
+            console.error('Options: Table body not found!');
+            return;
+        }
+        
         tbody.innerHTML = '';
         
-        chartData.forEach(day => {
+        if (chartData.length === 0) {
+            console.log('Options: No table data to display');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666; padding: 20px;">No focus data available</td></tr>';
+            return;
+        }
+        
+        chartData.forEach((day, index) => {
+            console.log(`Options: Adding table row ${index}:`, day);
+            
             const row = document.createElement('tr');
             
             const status = this.getDayStatus(day.totalTime);
@@ -614,6 +673,8 @@ class HackFocusOptions {
             
             tbody.appendChild(row);
         });
+        
+        console.log('Options: Table updated with', tbody.children.length, 'rows');
     }
     
     getDayStatus(totalTime) {
