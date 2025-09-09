@@ -332,7 +332,8 @@ class HackFocusOptions {
                     medium: 0,   // 30min sessions  
                     large: 0,    // 40min+ sessions
                     server: 0    // Special long sessions
-                }
+                },
+                dailyStats: {}   // Daily focus tracking
             };
             
             document.getElementById('total-sessions').textContent = stats.totalSessions;
@@ -342,6 +343,9 @@ class HackFocusOptions {
             
             // Update hacked computers display
             this.updateHackedComputersDisplay(stats.hackedComputers);
+            
+            // Update daily dashboard
+            this.updateDailyDashboard(stats.dailyStats);
         });
     }
     
@@ -496,6 +500,136 @@ class HackFocusOptions {
         return `${mins}m`;
     }
     
+    updateDailyDashboard(dailyStats) {
+        const timeRange = parseInt(document.getElementById('timeRange').value) || 7;
+        const chartData = this.getDailyChartData(dailyStats, timeRange);
+        
+        // Update dashboard stats
+        this.updateDashboardStats(chartData);
+        
+        // Update chart
+        this.updateDailyChart(chartData);
+        
+        // Update details table
+        this.updateDailyDetailsTable(chartData);
+    }
+    
+    getDailyChartData(dailyStats, days) {
+        const data = [];
+        const today = new Date();
+        
+        for (let i = days - 1; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            const dayData = dailyStats[dateStr] || {
+                totalTime: 0,
+                sessions: 0,
+                date: dateStr
+            };
+            
+            data.push({
+                date: dateStr,
+                displayDate: this.formatDisplayDate(date),
+                totalTime: dayData.totalTime,
+                sessions: dayData.sessions,
+                avgSession: dayData.sessions > 0 ? Math.round(dayData.totalTime / dayData.sessions) : 0
+            });
+        }
+        
+        return data;
+    }
+    
+    formatDisplayDate(date) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        } else {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+    }
+    
+    updateDashboardStats(chartData) {
+        const totalTime = chartData.reduce((sum, day) => sum + day.totalTime, 0);
+        const activeDays = chartData.filter(day => day.totalTime > 0).length;
+        const avgDaily = activeDays > 0 ? Math.round(totalTime / activeDays) : 0;
+        const bestDay = Math.max(...chartData.map(day => day.totalTime));
+        
+        document.getElementById('avg-daily-time').textContent = this.formatTime(avgDaily);
+        document.getElementById('best-day-time').textContent = this.formatTime(bestDay);
+        document.getElementById('active-days').textContent = activeDays;
+    }
+    
+    updateDailyChart(chartData) {
+        const chartContainer = document.getElementById('daily-chart');
+        chartContainer.innerHTML = '';
+        
+        const maxTime = Math.max(...chartData.map(day => day.totalTime), 1);
+        
+        chartData.forEach(day => {
+            const barHeight = (day.totalTime / maxTime) * 100;
+            
+            const bar = document.createElement('div');
+            bar.className = 'chart-bar';
+            bar.style.height = `${Math.max(barHeight, 2)}%`;
+            
+            const label = document.createElement('div');
+            label.className = 'chart-bar-label';
+            label.textContent = day.displayDate;
+            
+            const value = document.createElement('div');
+            value.className = 'chart-bar-value';
+            value.textContent = `${day.totalTime}m`;
+            
+            bar.appendChild(label);
+            bar.appendChild(value);
+            chartContainer.appendChild(bar);
+        });
+    }
+    
+    updateDailyDetailsTable(chartData) {
+        const tbody = document.getElementById('daily-details-body');
+        tbody.innerHTML = '';
+        
+        chartData.forEach(day => {
+            const row = document.createElement('tr');
+            
+            const status = this.getDayStatus(day.totalTime);
+            const statusClass = `status-${status.class}`;
+            const statusText = status.text;
+            
+            row.innerHTML = `
+                <td>${day.displayDate}</td>
+                <td>${this.formatTime(day.totalTime)}</td>
+                <td>${day.sessions}</td>
+                <td>${day.avgSession > 0 ? this.formatTime(day.avgSession) : '-'}</td>
+                <td><span class="status-indicator ${statusClass}"></span>${statusText}</td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+    
+    getDayStatus(totalTime) {
+        if (totalTime >= 120) {
+            return { class: 'excellent', text: 'Excellent' };
+        } else if (totalTime >= 60) {
+            return { class: 'good', text: 'Good' };
+        } else if (totalTime >= 25) {
+            return { class: 'fair', text: 'Fair' };
+        } else if (totalTime > 0) {
+            return { class: 'poor', text: 'Poor' };
+        } else {
+            return { class: 'none', text: 'No Focus' };
+        }
+    }
+    
     showStatus(message, type) {
         const statusElement = document.getElementById('status-message');
         statusElement.textContent = message;
@@ -623,5 +757,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('mission-matrix').addEventListener('click', () => {
         options.selectMission('matrix');
+    });
+    
+    // Add event listener for time range selector
+    document.getElementById('timeRange').addEventListener('change', () => {
+        // Reload stats to update dashboard with new time range
+        options.loadStats();
     });
 });

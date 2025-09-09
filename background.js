@@ -320,7 +320,8 @@ class HackFocusBackground {
                     medium: 0,
                     large: 0,
                     server: 0
-                }
+                },
+                dailyStats: {}   // Daily focus tracking
             };
             
             // Update basic stats
@@ -342,11 +343,60 @@ class HackFocusBackground {
                 console.log('Background: Server hacked! (Forest mission - 60min+ session)');
             }
             
+            // Update daily stats
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            if (!stats.dailyStats[today]) {
+                stats.dailyStats[today] = {
+                    totalTime: 0,
+                    sessions: 0,
+                    date: today
+                };
+            }
+            stats.dailyStats[today].totalTime += sessionDuration;
+            stats.dailyStats[today].sessions++;
+            
+            // Calculate current streak
+            stats.currentStreak = this.calculateStreak(stats.dailyStats);
+            
             // Save updated stats
             chrome.storage.local.set({ hackFocusStats: stats }, () => {
                 console.log('Background: Stats updated:', stats);
             });
         });
+    }
+    
+    calculateStreak(dailyStats) {
+        const dates = Object.keys(dailyStats).sort((a, b) => new Date(b) - new Date(a));
+        let streak = 0;
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        // Check if today or yesterday has focus time
+        if (dailyStats[today] && dailyStats[today].totalTime > 0) {
+            streak = 1;
+            // Count consecutive days backwards
+            for (let i = 1; i < dates.length; i++) {
+                const checkDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                if (dailyStats[checkDate] && dailyStats[checkDate].totalTime > 0) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+        } else if (dailyStats[yesterday] && dailyStats[yesterday].totalTime > 0) {
+            // If no focus today but had focus yesterday, start counting from yesterday
+            streak = 1;
+            for (let i = 2; i < dates.length; i++) {
+                const checkDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                if (dailyStats[checkDate] && dailyStats[checkDate].totalTime > 0) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        return streak;
     }
     
     showTimerNotification(timerState) {
